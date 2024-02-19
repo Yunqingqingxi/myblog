@@ -1,5 +1,7 @@
 <template>
-
+  <div>
+    <h1>wcnmm</h1>
+  </div>
 </template>
 
 <script setup>
