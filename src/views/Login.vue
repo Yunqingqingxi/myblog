@@ -1,71 +1,130 @@
 <template>
-  <div class="top">
-    <div class="logo">
-      <ul class="left">
-        <li class="title_style">
-          <img
-              id="header"
-              src="../../public/images/home.svg"
-              alt="">
-          <span> 个人博客</span>
-        </li>
-        <li class="v-title">
-        <span>
-        <router-link to="/Home" class="title_style">首页</router-link>
-        </span>
-        </li>
-        <li class="v-title">
-          <router-link to="/class" class="title_style">分类</router-link>
-        </li>
-        <li class="v-title">
-          <router-link to="/tag" class="title_style">标签</router-link>
-        </li>
-        <li class="v-title">
-          <router-link to="/archives" class="title_style">归档</router-link>
-        </li>
-        <li class="v-title">
-          <router-link to="/about" class="title_style">关于我</router-link>
-        </li>
-      </ul>
-      <ul class="center">
-        <li>
-          <form class="focus" id="search" style="border-radius: 8px 8px 0 0" >
-            <div id="search-content">
-              <input class="search-input" type="text" placeholder="搜索" >
-            </div>
-            <div class="search-btn">
-              <button style="width: 32px;height: 32px;">
-                <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path fill-rule="evenodd" clip-rule="evenodd" d="M16.3451 15.2003C16.6377 15.4915 16.4752 15.772 16.1934 16.0632C16.15 16.1279 16.0958 16.1818 16.0525 16.2249C15.7707 16.473 15.4456 16.624 15.1854 16.3652L11.6848 12.8815C10.4709 13.8198 8.97529 14.3267 7.44714 14.3267C3.62134 14.3267 0.5 11.2314 0.5 7.41337C0.5 3.60616 3.6105 0.5 7.44714 0.5C11.2729 0.5 14.3943 3.59538 14.3943 7.41337C14.3943 8.98802 13.8524 10.5087 12.8661 11.7383L16.3451 15.2003ZM2.13647 7.4026C2.13647 10.3146 4.52083 12.6766 7.43624 12.6766C10.3517 12.6766 12.736 10.3146 12.736 7.4026C12.736 4.49058 10.3517 2.1286 7.43624 2.1286C4.50999 2.1286 2.13647 4.50136 2.13647 7.4026Z" fill="currentColor"></path>
-                </svg>
-              </button>
-            </div>
-          </form>
-        </li>
-      </ul>
-      <ul class="right">
-        <li id="image">
-          <span>
-            <img
-                src="../assets/imageDemo.jpg"
-                style="width: 45px;height: 45px;top: 0"
-                alt="">
-          </span>
-        </li>
-        <li id="size">
-          用户名
-        </li>
-      </ul>
-    </div>
-  </div>
-  <div class="my-background">
+  <div class="login">
+    <h1 style="text-align: center">Login</h1>
+  <el-form
+      ref="ruleFormRef"
+      style="max-width: 600px;"
+      :model="ruleForm"
+      status-icon
+      :rules="rules"
+      label-width="auto"
+      class="demo-ruleForm"
+  >
+    <el-form-item label="账 号" prop="username">
+      <el-input v-model="ruleForm.username" type="text" autocomplete="off" style="margin-right: 10px" />
+    </el-form-item>
+    <el-form-item label="密 码" prop="password">
+      <el-input
+          v-model="ruleForm.password"
+          type="password"
+          autocomplete="off"
+          style="margin-right: 10px"
+      />
+    </el-form-item>
+    <el-form-item label="验证码" prop="code" style="width: 300px;margin-left: 5px;">
+      <el-input
+          v-model="ruleForm.code"
+          input-style="width: 20px;"
+      />
+      <div style="position: absolute;margin-left: 260px;margin-top: 9px;width: 320px">
+        <img :src="verificationCode" alt="验证码"  height="32px" @click="refreshCode()" style="cursor: pointer;"/>
+      </div>
+
+    </el-form-item>
+    <el-form-item>
+      <el-button type="primary" @click="submitForm()"  style="margin-left: 20px;width: 150px;">
+        登录
+      </el-button>
+      <el-button @click="resetForm(ruleFormRef)" class="button">重置</el-button>
+    </el-form-item>
+  </el-form>
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
+import { ref } from 'vue'
+import { ElMessage } from 'element-plus'
+import { login } from '../api/login'
+import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
+
+const ruleFormRef = ref(null)
+const router = useRouter()
+const store = useStore()
+
+// 表单数据和验证规则
+const ruleForm = ref({
+  username: '',
+  password: '',
+  code: ''
+})
+
+const rules = ref({
+  username: [{ required: true, message: '请输入账号', trigger: 'blur' }],
+  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+  code: [{ required: true, message: '请输入验证码', trigger: 'blur' }]
+})
+
+const verificationCode = ref('http://localhost:8080/api/generateVerificationCode') // 存储验证码图片的 URL
+
+// 刷新验证码图片
+const refreshCode = () => {
+  // 通过修改 URL 触发重新加载验证码图片
+  verificationCode.value = `http://localhost:8080/api/generateVerificationCode?_=${Date.now()}`
+}
+
+// 页面加载时刷新验证码
+refreshCode()
+
+// 提交表单
+const submitForm = async () => {
+  if (!ruleFormRef.value) return
+
+  try {
+    await ruleFormRef.value.validate()
+
+    // 从页面上获取用户输入的验证码
+    const userInputCode = ruleForm.value.code
+
+    // 发送登录请求
+    const response = await login(ruleForm.value)
+
+    if (response.code === 200) {
+      ElMessage.success('登录成功')
+      store.commit('login', ruleForm.value.username) // 更新登录状态
+      await router.push('/Home')
+      refreshCode() // 登录成功后刷新验证码
+    } else {
+      ElMessage.error('登录失败')
+      refreshCode() // 登录失败后刷新验证码
+    }
+  } catch (error) {
+    ElMessage.error('请检查输入')
+    refreshCode()
+  }
+}
+
+// 重置表单
+const resetForm = (formEl) => {
+  if (!formEl) return
+  formEl.resetFields()
+}
 
 </script>
 
 <style scoped>
-
+.login{
+  position: absolute;
+  width: 420px;
+  height: 300px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+.button{
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  margin-right: 10px;
+  width: 150px;
+}
 </style>
