@@ -1,6 +1,7 @@
 <template>
+  <div class="login-overlay">
   <div class="login">
-    <h1 style="text-align: center">Login</h1>
+    <h1 style="text-align: center">登 录</h1>
   <el-form
       ref="ruleFormRef"
       style="max-width: 600px;"
@@ -19,6 +20,7 @@
           type="password"
           autocomplete="off"
           style="margin-right: 10px"
+          :show-password=true
       />
     </el-form-item>
     <el-form-item label="验证码" prop="code" style="width: 300px;margin-left: 5px;">
@@ -27,24 +29,26 @@
           input-style="width: 20px;"
       />
       <div style="position: absolute;margin-left: 260px;margin-top: 9px;width: 320px">
-        <img :src="verificationCode" alt="验证码"  height="32px" @click="refreshCode()" style="cursor: pointer;"/>
+        <img :src="verificationCode" alt="点击刷新验证码" width="80px" height="32px" @click="refreshCode()" style="cursor: pointer;"/>
       </div>
-
     </el-form-item>
+<el-form-item>
+  <router-link to="register" class="el-link" style="margin-left: auto">没有账号？点这里注册！</router-link>
+</el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="submitForm()"  style="margin-left: 20px;width: 150px;">
+      <el-button type="primary" @click="submitForm()"  style="margin-left: 50px;width: 350px;">
         登录
       </el-button>
-      <el-button @click="resetForm(ruleFormRef)" class="button">重置</el-button>
     </el-form-item>
   </el-form>
   </div>
+  </div>
 </template>
 
-<script lang="ts" setup>
+<script setup>
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { login } from '../api/login'
+import { user } from '../api/user.js'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 
@@ -56,21 +60,26 @@ const store = useStore()
 const ruleForm = ref({
   username: '',
   password: '',
-  code: ''
+  code: '',
 })
 
 const rules = ref({
-  username: [{ required: true, message: '请输入账号', trigger: 'blur' }],
-  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+  username: [
+      { required: true, message: '请输入账号', trigger: 'blur' },
+    {min: 8, max: 12, message: '长度为5-13位', trigger: 'blur'},
+  ],
+  password: [
+      { required: true, message: '请输入密码', trigger: 'blur' },
+    {min: 8, message: '长度为8-12位', trigger: 'blur'},],
   code: [{ required: true, message: '请输入验证码', trigger: 'blur' }]
 })
 
-const verificationCode = ref('http://localhost:8080/api/generateVerificationCode') // 存储验证码图片的 URL
+const verificationCode = ref('http://localhost:8080/api/getCode') // 存储验证码图片的 URL
 
 // 刷新验证码图片
 const refreshCode = () => {
   // 通过修改 URL 触发重新加载验证码图片
-  verificationCode.value = `http://localhost:8080/api/generateVerificationCode?_=${Date.now()}`
+  verificationCode.value = `http://localhost:8080/api/getCode?_=${Date.now()}`
 }
 
 // 页面加载时刷新验证码
@@ -82,45 +91,61 @@ const submitForm = async () => {
 
   try {
     await ruleFormRef.value.validate()
-
-    // 从页面上获取用户输入的验证码
-    const userInputCode = ruleForm.value.code
-
+    
     // 发送登录请求
-    const response = await login(ruleForm.value)
-
+    const response = await user(ruleForm.value)
+   
+    console.log("fa")
     if (response.code === 200) {
+      console.log('cg')
+      const token = response.data.token
+      localStorage.setItem('token', token)
+
+      
+
       ElMessage.success('登录成功')
-      store.commit('login', ruleForm.value.username) // 更新登录状态
-      await router.push('/Home')
+      await router.push('/')
       refreshCode() // 登录成功后刷新验证码
     } else {
-      ElMessage.error('登录失败')
+      ElMessage.error(response.msg) // 这里需要使用response.msg，因为后端返回的是map，包含code和msg字段
+      router.push('/login')
       refreshCode() // 登录失败后刷新验证码
     }
   } catch (error) {
-    ElMessage.error('请检查输入')
+    ElMessage.error(error)
     refreshCode()
   }
-}
-
-// 重置表单
-const resetForm = (formEl) => {
-  if (!formEl) return
-  formEl.resetFields()
 }
 
 </script>
 
 <style scoped>
-.login{
+.login-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: white; /* 使用白色背景测试 */
+  z-index: 1; /* 确保登录界面在顶部，比导航栏的 z-index 值小 */
+}
+
+.login {
   position: absolute;
-  width: 420px;
-  height: 300px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 450px;
+  height: 320px;
   border: 1px solid #ccc;
   border-radius: 10px;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* 确保登录界面在遮罩之上 */
 }
-.button{
+
+/* Your existing button styles */
+.button {
   display: flex;
   align-items: center;
   margin-left: auto;

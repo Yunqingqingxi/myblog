@@ -1,5 +1,5 @@
 <template>
-<!--<h1>ddd</h1>-->
+<h1>这是首页</h1>
 </template>
 
 <script setup>

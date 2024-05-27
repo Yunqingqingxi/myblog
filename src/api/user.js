@@ -1,9 +1,15 @@
 import request from "../util/request.js"
 
-export const login = (data) => {
+export const user = (data) => {
     return request({
         method:'post',
-        url:'login',
+        url:'api/login',
         data
+    })
+}
+export const logout = (data) => {
+    return request({
+        method:'post',
+        url:'/logout',
     })
 }
