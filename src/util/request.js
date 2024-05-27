@@ -48,6 +48,8 @@ service.interceptors.response.use(
                 case 504:
                     ElMessage.error('请求超时，请稍后再试')
                     break
+                case 301:
+                    ElMessage.error('用户名或密码错误')
                 default:
                     ElMessage.error('系统异常')
                     break
