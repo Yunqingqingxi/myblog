@@ -145,6 +145,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useStore } from 'vuex'
+import { useUserStore } from './store/user';
 import { useRouter } from "vue-router";
 import {UserFilled} from "@element-plus/icons-vue";
 
@@ -195,7 +196,10 @@ const editProfile = () => {
 
 // 执行登出操作
 const logout = () => {
+  console.log('点击了登出')
   // 执行登出操作的逻辑
+  const userStore = useUserStore();
+    userStore.clearToken(); // 调用 Vuex 存储中的 clearToken 方法清除用户认证信
 }
 
 

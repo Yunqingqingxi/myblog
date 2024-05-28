@@ -1,7 +1,9 @@
 <template>
 
   <div>
-    <h1>这是关于界面</h1>
+    <h1>
+      <button>这是关于界面</button></h1>
+
   </div>
 </template>
 

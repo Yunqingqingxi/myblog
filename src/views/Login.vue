@@ -50,11 +50,11 @@ import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { user } from '../api/user.js'
 import { useRouter } from 'vue-router'
-import { useStore } from 'vuex'
+import { useTokenStore } from '../store/token' // 引入 token store
 
 const ruleFormRef = ref(null)
 const router = useRouter()
-const store = useStore()
+const tokenStore = useTokenStore() // 使用 token store
 
 // 表单数据和验证规则
 const ruleForm = ref({
@@ -65,12 +65,13 @@ const ruleForm = ref({
 
 const rules = ref({
   username: [
-      { required: true, message: '请输入账号', trigger: 'blur' },
-    {min: 8, max: 12, message: '长度为5-13位', trigger: 'blur'},
+    { required: true, message: '请输入账号', trigger: 'blur' },
+    { min: 8, max: 12, message: '长度为5-13位', trigger: 'blur' },
   ],
   password: [
-      { required: true, message: '请输入密码', trigger: 'blur' },
-    {min: 8, message: '长度为8-12位', trigger: 'blur'},],
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { min: 8, message: '长度为8-12位', trigger: 'blur' },
+  ],
   code: [{ required: true, message: '请输入验证码', trigger: 'blur' }]
 })
 
@@ -94,20 +95,19 @@ const submitForm = async () => {
     
     // 发送登录请求
     const response = await user(ruleForm.value)
-   
-    console.log("fa")
+  
     if (response.code === 200) {
-      console.log('cg')
       const token = response.data.token
       localStorage.setItem('token', token)
-
       
+      // 更新 Pinia 的 token store
+      tokenStore.setToken(token)
 
       ElMessage.success('登录成功')
       await router.push('/')
       refreshCode() // 登录成功后刷新验证码
     } else {
-      ElMessage.error(response.msg) // 这里需要使用response.msg，因为后端返回的是map，包含code和msg字段
+      ElMessage.error(response.msg) // 这里需要使用 response.msg，因为后端返回的是 map，包含 code 和 msg 字段
       router.push('/login')
       refreshCode() // 登录失败后刷新验证码
     }

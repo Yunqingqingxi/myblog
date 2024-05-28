@@ -14,7 +14,6 @@ const pinia = createPinia()
 const persistedState = createPersistedState();
 pinia.use(persistedState)
 
-
 app.use(pinia)
 app.use(router)
 app.use(Element)
