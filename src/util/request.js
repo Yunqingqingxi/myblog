@@ -5,7 +5,6 @@ import { useTokenStore } from "../store/token";  // 确保路径正确
 import { ElMessage } from 'element-plus';
 
 const service = axios.create({
-    baseURL: 'http://localhost:8080', // 请求基础路径
     timeout: 10000, // 请求超时时间
     headers: {
         'Content-Type': 'application/json',
@@ -22,6 +21,7 @@ service.interceptors.request.use(
         if (token) {
            config.headers.Authorization =token;
         }
+
         return config;
     },
     error => {
@@ -42,8 +42,9 @@ service.interceptors.response.use(
                     break;
                 case 401:
                     ElMessage.error('尚未登录，请重新登录');
-                    localStorage.removeItem('token');
-                    router.push('/login');
+                    router.push('/login').then(r => {
+                        localStorage.removeItem('token');
+                    });
                     break;
                 case 403:
                     ElMessage.error('您没有权限，请联系管理员');

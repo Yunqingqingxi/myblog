@@ -75,12 +75,12 @@ const rules = ref({
   code: [{ required: true, message: '请输入验证码', trigger: 'blur' }]
 })
 
-const verificationCode = ref('http://localhost:8080/api/getCode') // 存储验证码图片的 URL
+const verificationCode = ref('http://localhost:8080/getCode') // 存储验证码图片的 URL
 
 // 刷新验证码图片
 const refreshCode = () => {
   // 通过修改 URL 触发重新加载验证码图片
-  verificationCode.value = `http://localhost:8080/api/getCode?_=${Date.now()}`
+  verificationCode.value = `http://localhost:8080/getCode?_=${Date.now()}`
 }
 
 // 页面加载时刷新验证码
@@ -92,10 +92,10 @@ const submitForm = async () => {
 
   try {
     await ruleFormRef.value.validate()
-    
+
     // 发送登录请求
     const response = await user(ruleForm.value)
-  
+
     if (response.code === 200) {
       const token = response.data.token
       localStorage.setItem('token', token)
@@ -108,7 +108,7 @@ const submitForm = async () => {
       refreshCode() // 登录成功后刷新验证码
     } else {
       ElMessage.error(response.msg) // 这里需要使用 response.msg，因为后端返回的是 map，包含 code 和 msg 字段
-      router.push('/login')
+      await router.push('/login')
       refreshCode() // 登录失败后刷新验证码
     }
   } catch (error) {
