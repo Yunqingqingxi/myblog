@@ -1,7 +1,6 @@
 <template>
   <!-- aside -->
   <el-menu
-
       @select="handleSelect"
   >
     <!-- 在el-menu中修改背景颜色和字体颜色 -->
@@ -9,7 +8,7 @@
       <template #title>
         <span>博客</span>
       </template>
-      <el-menu-item index='/null'>
+      <el-menu-item index="/null">
         <span>写博客</span>
       </el-menu-item>
       <el-menu-item index='/search'>
@@ -24,11 +23,11 @@
       <template #title>
         <span>我的</span>
       </template>
-      <el-menu-item index="/perinfo">
+      <el-menu-item index="/user/perinfo">
         <span>个人资料</span>
       </el-menu-item>
-      <el-menu-item>
-        <span>修改密码</span>
+      <el-menu-item index="/user/register">
+        <span>注册</span>
       </el-menu-item>
       <el-menu-item>
         <span>收到的信息</span>
@@ -85,7 +84,7 @@
 
 <script setup lang="ts">
 
-import { useRouter } from 'vue-router';
+import {useRouter} from 'vue-router';
 
 const router = useRouter();
 
@@ -96,15 +95,5 @@ function handleSelect(key){
 </script>
 
 <style scoped>
-@keyframes float {
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}
+
 </style>

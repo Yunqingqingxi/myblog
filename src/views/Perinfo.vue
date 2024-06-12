@@ -27,10 +27,10 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { UserFilled } from "@element-plus/icons-vue";
-import { getUserData } from '../api/user';
+import { getUserData } from "@/api/user"
 
 const username = ref('');
 const email = ref('');
@@ -140,7 +140,7 @@ html, body {
   margin-left: 160px;
   padding: 20px;
   background: white;
-  box-shadow: 0px -5px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.1);
   transition: max-height 0.5s ease, opacity 0.5s ease;
   max-height: 0;
   opacity: 0;

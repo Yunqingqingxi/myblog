@@ -25,7 +25,7 @@
       <el-input v-model="formLabelAlign.phone" />
     </el-form-item>
     <el-form-item>
-      <el-button @click="onRegister" style="width: 300px;margin-left: 20px">确定</el-button>
+      <el-button @click="onRegister" style="width: 300px;margin-left: 30px;border-radius: 20px;background-color: cyan">确定</el-button>
     </el-form-item>
   </el-form>
   </div>
@@ -37,7 +37,7 @@ import { ref } from "vue";
 import { useRouter } from 'vue-router'
 import  { register,user } from "../api/user.js";
 import {ElMessage} from "element-plus";
-import {useUserStore} from "../store/user.js";
+import {useUserStore} from "@/store/user.js";
 
 const ruleFormRef = ref(null)
 const router = useRouter()
@@ -52,7 +52,7 @@ const formLabelAlign = ref({
 
 const rule = ref({
   username:[
-      {required: true,message:'为输入账号',trigger:"blur"},
+      {required: true,message:'未输入账号',trigger:"blur"},
   ],
   password:[{required: true,min:8,message:'未输入密码',trigger:'blur'}],
   rePassword:[
@@ -74,8 +74,6 @@ const onRegister = async () => {
     if (res.code === 200) {
 
       const token = res.data.token;
-      localStorage.setItem('token', token);
-
       store.setToken(token);
 
       ElMessage.success('注册成功')

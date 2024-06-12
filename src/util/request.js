@@ -1,8 +1,8 @@
 // src/utils/axios.js
 import axios from 'axios';
 import router from "../router/index.js";
-import { useTokenStore } from "../store/token";  // 确保路径正确
-import { ElMessage } from 'element-plus';
+import {useUserStore} from "../store/user"; // 确保路径正确
+import {ElMessage} from 'element-plus';
 
 const service = axios.create({
     timeout: 10000, // 请求超时时间
@@ -15,7 +15,7 @@ const service = axios.create({
 service.interceptors.request.use(
     config => {
         
-        const tokenStore = useTokenStore();
+        const tokenStore = useUserStore();
         const token = tokenStore.token;
 
         if (token) {

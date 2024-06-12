@@ -1,61 +1,52 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { useTokenStore } from '../store/token';
-import Home from '../views/home.vue';
+import { useUserStore } from '../store/user';
+import Error from '@/views/Error.vue';
+import Tag from '@/views/Tag.vue';
+import Login from '@/pages/Login/Login.vue';
+import Register from '@/views/Register.vue';
+import PerInfo from '@/views/Perinfo.vue';
+import Notfound from "@/components/Notfound.vue";
+import Homepage from '@/pages/HomePage/Layout/HomePage.vue';
+import About from "@/views/About.vue";
+import Home from "@/views/Home.vue";
 
 const routes = [
   {
-    name: '主页',
     path: '/',
-    component: Home,
-    meta: { layout: 'default' },
+    component: Homepage,
+    children:[
+      {
+        name:'首页',
+        path:'/home',
+        component:Home
+      },
+      {
+        path: "/about",
+        name:'关于',
+        component:About
+      },
+      {
+        path: "/userinfo",
+        name:'用户信息',
+        component: PerInfo
+      }
+    ]
   },
   {
-    name: '错误',
-    path: '/error',
-    component: () => import('../views/error.vue'),
-    meta: { layout: 'default' },
+    path: '/:pathMatch(.*)*',
+    name: '404',
+    component: Notfound,
   },
   {
-    name: '分类',
-    path: '/class',
-    component: () => import('../views/SideBar.vue'),
-    meta: { layout: 'default' },
-  },
-  {
-    name: '标签',
-    path: '/tag',
-    component: () => import('../views/Tag.vue'),
-    meta: { layout: 'default' },
-  },
-  {
-    name: '归档',
-    path: '/archives',
-    component: () => import('../views/SideBar.vue'),
-    meta: { layout: 'default' },
-  },
-  {
-    name: '关于',
-    path: '/about',
-    component: () => import('../views/About.vue'),
-    meta: { requireAuth: true, layout: 'default' },
-  },
-  {
-    name: '登录',
     path: '/login',
-    component: () => import('../views/login.vue'),
-    meta: { layout: 'auth' },
+    name: 'login',
+    component: Login,
   },
   {
-    name: '注册',
+    name: 'register',
     path: '/register',
-    component: () => import('../views/register.vue'),
-    meta: { layout: 'auth' },
-  },
-  {
-    path: '/perinfo',
-    component: () => import('../views/perinfo.vue'),
-    meta: { layout: 'default' },
-  },
+    component: Register,
+  }
 ];
 
 const router = createRouter({
@@ -64,7 +55,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const tokenStore = useTokenStore();
+  const tokenStore = useUserStore();
 
   if (to.meta.requireAuth && (!tokenStore.token || !localStorage.getItem("token"))) {
     next('/login');

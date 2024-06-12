@@ -4,7 +4,7 @@ import request from "../util/request.js"
 export const user = (data) => {
     return request({
         method:'post',
-        url:'api/login',
+        url:'api/user/login',
         data
     })
 }
@@ -12,22 +12,22 @@ export const user = (data) => {
 export const logout = (data) => {
     return request({
         method:'get',
-        url:'api/logout',
+        url:'api/user/logout',
     })
 }
 // 注册
 export const register = (data) => {
     return request({
         method:'post',
-        url:'api/register',
+        url:'api/user/register',
         data
     })
 }
 
 // 获取用户数据
-export const getUserData = (data) => {
+export const getUserData = () => {
     return request({
         method: 'get',
-        url: 'api/user',
+        url: 'api/user/userinfo',
     });
 };

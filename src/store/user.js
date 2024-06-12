@@ -1,10 +1,7 @@
 // src/stores/user.js
 
 // 引入 pinia 的 defineStore 方法
-import { defineStore } from 'pinia';
-
-// 引入 API 调用方法 getUserData，用于获取用户数据
-import { getUserData } from '../api/user';
+import {defineStore} from 'pinia';
 
 // 定义一个名为 useUserStore 的 pinia 存储
 export const useUserStore = defineStore({
@@ -44,11 +41,11 @@ export const useUserStore = defineStore({
         },
         // 清除令牌，重置认证状态和用户信息
         clearToken() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('pinia-token');
             this.token = '';
             this.isAuthenticated = false;
             this.user = null;
-            localStorage.removeItem('token');
-            localStorage.removeItem('pinia-token');
         },
     },
     // 配置数据持久化
